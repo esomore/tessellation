@@ -23,6 +23,7 @@ object Dependencies {
     val http4sJwtAuth = "1.0.0"
     val log4cats = "2.1.1"
     val monocle = "3.0.0"
+    val mapref = "0.2.0-M2"
     val newtype = "0.4.4"
     val refined = "0.9.27"
     val redis4cats = "1.0.0"
@@ -92,6 +93,7 @@ object Dependencies {
 
     val h2 = "com.h2database" % "h2" % V.h2
 
+    val http4sCore = http4s("core")
     val http4sDsl = http4s("dsl")
     val http4sServer = http4s("ember-server")
     val http4sClient = http4s("ember-client")
@@ -128,6 +130,8 @@ object Dependencies {
 
     val chill = "com.twitter" %% "chill" % V.twitterChill
     val shapeless = "com.chuusai" %% "shapeless" % V.shapeless
+
+    val mapref = "io.chrisdavenport" %% "mapref" % V.mapref
 
     // Runtime
     val logback = "ch.qos.logback" % "logback-classic" % V.logback

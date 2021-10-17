@@ -5,8 +5,8 @@ import cats.syntax.flatMap._
 import cats.syntax.functor._
 
 import org.tesselation.domain.cluster.programs.{Joining, PeerDiscovery}
-import org.tesselation.effects.GenUUID
 import org.tesselation.http.p2p.P2PClient
+import org.tesselation.infrastructure.gossip.{RumorHandler, RumorHandlers}
 import org.tesselation.keytool.security.SecurityProvider
 import org.tesselation.kryo.KryoSerializer
 import org.tesselation.schema.peer.PeerId
@@ -31,10 +31,12 @@ object Programs {
         nodeId,
         pd
       )
-    } yield new Programs[F](pd, joining) {}
+      rumorHandler = RumorHandlers.make[F]
+    } yield new Programs[F](pd, joining, rumorHandler) {}
 }
 
-sealed abstract class Programs[F[_]: Async: GenUUID: SecurityProvider: KryoSerializer] private (
+sealed abstract class Programs[F[_]: Async: SecurityProvider: KryoSerializer] private (
   val peerDiscovery: PeerDiscovery[F],
-  val joining: Joining[F]
+  val joining: Joining[F],
+  val rumorHandler: RumorHandler[F]
 ) {}
