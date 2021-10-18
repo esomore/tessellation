@@ -1,19 +1,20 @@
 package org.tesselation.modules
 
+import cats.Parallel
 import cats.effect.Async
+import cats.effect.std.Random
 import cats.syntax.flatMap._
 import cats.syntax.functor._
 
 import org.tesselation.domain.cluster.programs.{Joining, PeerDiscovery}
 import org.tesselation.http.p2p.P2PClient
-import org.tesselation.infrastructure.gossip.{RumorHandler, RumorHandlers}
 import org.tesselation.keytool.security.SecurityProvider
 import org.tesselation.kryo.KryoSerializer
 import org.tesselation.schema.peer.PeerId
 
 object Programs {
 
-  def make[F[_]: Async: SecurityProvider: KryoSerializer](
+  def make[F[_]: Async: Parallel: Random: SecurityProvider: KryoSerializer](
     storages: Storages[F],
     services: Services[F],
     p2pClient: P2PClient[F],
@@ -31,12 +32,10 @@ object Programs {
         nodeId,
         pd
       )
-      rumorHandler = RumorHandlers.make[F]
-    } yield new Programs[F](pd, joining, rumorHandler) {}
+    } yield new Programs[F](pd, joining) {}
 }
 
 sealed abstract class Programs[F[_]: Async: SecurityProvider: KryoSerializer] private (
   val peerDiscovery: PeerDiscovery[F],
-  val joining: Joining[F],
-  val rumorHandler: RumorHandler[F]
+  val joining: Joining[F]
 ) {}

@@ -1,4 +1,4 @@
-package org.tesselation.domain.cluster.storage
+package org.tesselation.domain.gossip.storage
 
 import org.tesselation.crypto.hash.Hash
 import org.tesselation.schema.gossip.RumorBatch

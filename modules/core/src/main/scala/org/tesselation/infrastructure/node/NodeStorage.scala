@@ -24,6 +24,7 @@ object NodeStorage {
 
     def tryModifyState[A](from: Set[NodeState], onStart: NodeState, onFinish: NodeState)(fn: => F[A]): F[A] =
       getNodeState.flatMap { initial =>
+        nodeState.access
         modify(from, onStart).flatMap {
           case NodeStateTransition.Failure => InvalidNodeStateTransition(initial, from, onStart).raiseError[F, A]
           case NodeStateTransition.Success =>

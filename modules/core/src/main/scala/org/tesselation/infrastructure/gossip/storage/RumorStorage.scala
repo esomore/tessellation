@@ -1,13 +1,17 @@
-package org.tesselation.infrastructure.cluster.storage
+package org.tesselation.infrastructure.gossip.storage
 
-import cats.effect.kernel.{Async, Spawn, Temporal}
-import cats.syntax.all._
+import cats.effect.{Async, Spawn, Temporal}
+import cats.syntax.flatMap._
+import cats.syntax.functor._
+import cats.syntax.option._
+import cats.syntax.traverse._
+import cats.syntax.traverseFilter._
 
 import scala.concurrent.duration._
 
 import org.tesselation.crypto.Signed
 import org.tesselation.crypto.hash.Hash
-import org.tesselation.domain.cluster.storage.RumorStorage
+import org.tesselation.domain.gossip.storage.RumorStorage
 import org.tesselation.schema.gossip.{Rumor, RumorBatch, RumorEntry}
 
 import io.chrisdavenport.mapref.MapRef

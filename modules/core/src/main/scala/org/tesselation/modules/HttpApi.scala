@@ -16,17 +16,15 @@ object HttpApi {
 
   def make[F[_]: Async: KryoSerializer](
     storages: Storages[F],
-    queues: Queues[F],
     services: Services[F],
     programs: Programs[F],
     environment: AppEnvironment
   ): HttpApi[F] =
-    new HttpApi[F](storages, queues, services, programs, environment) {}
+    new HttpApi[F](storages, services, programs, environment) {}
 }
 
 sealed abstract class HttpApi[F[_]: Async: KryoSerializer] private (
   storages: Storages[F],
-  queues: Queues[F],
   services: Services[F],
   programs: Programs[F],
   environment: AppEnvironment
@@ -35,9 +33,9 @@ sealed abstract class HttpApi[F[_]: Async: KryoSerializer] private (
   private val clusterRoutes =
     ClusterRoutes[F](programs.joining, programs.peerDiscovery, storages.cluster)
   private val registrationRoutes = RegistrationRoutes[F](services.cluster)
-  private val gossipRoutes = GossipRoutes[F](storages.rumor, queues.rumor, services.gossip)
+  private val gossipRoutes = GossipRoutes[F](services.gossip)
 
-  private val debugRoutes = DebugRoutes[F](storages, services).routes
+  private val debugRoutes = DebugRoutes[F](storages, services, programs).routes
 
   private val openRoutes: HttpRoutes[F] =
     (if (environment == Testnet) debugRoutes else HttpRoutes.empty) <+>

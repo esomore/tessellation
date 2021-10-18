@@ -1,13 +1,15 @@
 package org.tesselation.modules
 
-import cats.effect.kernel.Async
+import cats.effect.Async
 import cats.syntax.flatMap._
 import cats.syntax.functor._
 
 import org.tesselation.domain.cluster.storage._
+import org.tesselation.domain.gossip.storage.RumorStorage
 import org.tesselation.domain.node.NodeStorage
 import org.tesselation.infrastructure.cluster.storage._
 import org.tesselation.infrastructure.db.doobie.DoobieTransactor
+import org.tesselation.infrastructure.gossip.storage.RumorStorage
 import org.tesselation.infrastructure.node.NodeStorage
 
 object Storages {

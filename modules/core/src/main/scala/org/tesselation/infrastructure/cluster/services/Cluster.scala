@@ -12,12 +12,30 @@ import org.tesselation.crypto.Signed
 import org.tesselation.domain.cluster.services.Cluster
 import org.tesselation.domain.cluster.storage.SessionStorage
 import org.tesselation.ext.crypto._
+import org.tesselation.infrastructure.gossip.RumorHandler
+import org.tesselation.infrastructure.gossip.services.Gossip
 import org.tesselation.keytool.security.SecurityProvider
 import org.tesselation.kryo.KryoSerializer
 import org.tesselation.schema.cluster._
 import org.tesselation.schema.peer.{PeerId, RegistrationRequest, SignRequest}
 
+import org.typelevel.log4cats.slf4j.Slf4jLogger
+
 object Cluster {
+
+  def make[F[_]: Async: KryoSerializer: SecurityProvider](
+    cfg: AppConfig,
+    nodeId: PeerId,
+    keyPair: KeyPair,
+    sessionStorage: SessionStorage[F],
+    gossip: Gossip[F]
+  ): F[Cluster[F]] =
+    gossip
+      .registerHandler(RumorHandler.fromFn { (a: String) =>
+        val logger = Slf4jLogger.getLogger[F]
+        logger.info(s"Cluster handler for type string. Received=${a}")
+      })
+      .as(make(cfg, nodeId, keyPair, sessionStorage))
 
   def make[F[_]: Async: KryoSerializer: SecurityProvider](
     cfg: AppConfig,

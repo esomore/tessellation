@@ -6,6 +6,6 @@ import org.tesselation.schema.gossip.Rumor
 
 package object gossip {
 
-  type RumorHandler[F[_]] = Kleisli[OptionT[F, *], Rumor, Unit]
+  type RumorHandler[F[_]] = Kleisli[OptionT[F, *], Rumor, Unit] // TODO: move to domain
 
 }

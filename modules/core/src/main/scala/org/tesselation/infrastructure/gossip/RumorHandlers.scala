@@ -10,11 +10,9 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 object RumorHandlers {
 
-  def make[F[_]: Async: KryoSerializer]: RumorHandler[F] =
-    debugHandlers[F]
-
-  private def debugHandlers[F[_]: Async: KryoSerializer]: RumorHandler[F] = {
+  def debugHandlers[F[_]: Async: KryoSerializer]: RumorHandler[F] = {
     val logger = Slf4jLogger.getLogger[F]
+
     val strHandler = RumorHandler.fromFn[F, String] { s =>
       logger.info(s"String rumor received $s")
     }
@@ -24,6 +22,7 @@ object RumorHandlers {
       case o =>
         MonadThrow[F].raiseError(new RuntimeException(s"Int rumor error ${o.map(_.toString).getOrElse("none")}"))
     }
+
     strHandler <+> optIntHandler
   }
 }

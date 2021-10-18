@@ -1,11 +1,11 @@
 package org.tesselation.http.routes
 
-import cats.effect.kernel.Async
+import cats.effect.Async
 import cats.syntax.applicativeError._
 import cats.syntax.flatMap._
 import cats.syntax.option._
 
-import org.tesselation.modules.{Services, Storages}
+import org.tesselation.modules.{Programs, Services, Storages}
 import org.tesselation.schema.cluster.SessionAlreadyExists
 import org.tesselation.schema.node.InvalidNodeStateTransition
 
@@ -16,7 +16,8 @@ import org.http4s.server.Router
 
 final case class DebugRoutes[F[_]: Async](
   storages: Storages[F],
-  services: Services[F]
+  services: Services[F],
+  programs: Programs[F]
 ) extends Http4sDsl[F] {
 
   private[routes] val prefixPath = "/debug"

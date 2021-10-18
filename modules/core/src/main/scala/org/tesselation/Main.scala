@@ -14,7 +14,6 @@ import org.tesselation.http.p2p.P2PClient
 import org.tesselation.infrastructure.db.Migrations
 import org.tesselation.infrastructure.db.doobie.{DoobieDataSource, DoobieTransactor}
 import org.tesselation.infrastructure.genesis.{Loader => GenesisLoader}
-import org.tesselation.infrastructure.gossip.GossipDaemon
 import org.tesselation.keytool.KeyStoreUtils
 import org.tesselation.keytool.security.SecurityProvider
 import org.tesselation.kryo.{KryoSerializer, coreKryoRegistrar}
@@ -51,34 +50,21 @@ object Main extends IOApp {
                           p2pClient = P2PClient.make[IO](res.client)
                           migrations = Migrations.make[IO]
                           _ <- Resource.eval(migrations.migrate)
-                          queues <- Resource.eval {
-                            Queues.make[IO]
-                          }
                           storages <- Resource.eval {
                             Storages.make[IO]
                           }
                           services <- Resource.eval {
-                            Services.make[IO](cfg, nodeId, keyPair, storages, queues)
+                            Services.make[IO](cfg, nodeId, keyPair, storages, p2pClient)
                           }
                           programs <- Resource.eval {
                             Programs.make[IO](storages, services, p2pClient, nodeId)
                           }
-                          api = HttpApi.make[IO](storages, queues, services, programs, cfg.environment)
-                          _ <- Resource.eval {
-                            GossipDaemon
-                              .make[IO](
-                                storages.rumor,
-                                queues.rumor,
-                                storages.cluster,
-                                p2pClient.gossip,
-                                programs.rumorHandler
-                              )
-                              .startDaemon
-                          }
+                          api = HttpApi.make[IO](storages, services, programs, cfg.environment)
 
                           _ <- MkHttpServer[IO].newEmber(ServerName("public"), cfg.httpConfig.publicHttp, api.publicApp)
                           _ <- MkHttpServer[IO].newEmber(ServerName("p2p"), cfg.httpConfig.p2pHttp, api.p2pApp)
                           _ <- MkHttpServer[IO].newEmber(ServerName("cli"), cfg.httpConfig.cliHttp, api.cliApp)
+
                           _ <- Resource.eval {
                             cli.method match {
                               case CliMethod.RunValidator =>
