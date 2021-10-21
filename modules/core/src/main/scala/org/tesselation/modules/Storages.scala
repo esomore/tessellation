@@ -5,10 +5,8 @@ import cats.syntax.flatMap._
 import cats.syntax.functor._
 
 import org.tesselation.domain.cluster.storage.{ClusterStorage, NodeStorage, SessionStorage}
-import org.tesselation.domain.trust.storage.TrustStorage
 import org.tesselation.infrastructure.cluster.storage.{ClusterStorage, SessionStorage}
 import org.tesselation.infrastructure.node.NodeStorage
-import org.tesselation.infrastructure.trust.storage.TrustStorage
 
 object Storages {
 
@@ -17,19 +15,16 @@ object Storages {
       clusterStorage <- ClusterStorage.make[F]
       nodeStorage <- NodeStorage.make[F]
       sessionStorage <- SessionStorage.make[F]
-      trustStorage <- TrustStorage.make[F]
     } yield
       new Storages[F](
         cluster = clusterStorage,
         node = nodeStorage,
-        session = sessionStorage,
-        trust = trustStorage
+        session = sessionStorage
       ) {}
 }
 
 sealed abstract class Storages[F[_]] private (
   val cluster: ClusterStorage[F],
   val node: NodeStorage[F],
-  val session: SessionStorage[F],
-  val trust: TrustStorage[F]
+  val session: SessionStorage[F]
 )
