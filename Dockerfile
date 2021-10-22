@@ -5,9 +5,6 @@ ENV SBT_VERSION=1.5.5
 
 WORKDIR /build
 
-## Download bouncycastle
-RUN wget http://www.bouncycastle.org/download/bcprov-jdk15on-169.jar
-
 # Cache dependencies first
 COPY project project
 COPY modules modules
@@ -25,11 +22,6 @@ ENV CL_PASSWORD=1234
 ENV CL_KEYPASS=1234
 ENV CL_STOREPASS=1234
 ENV CL_KEYALIAS=alias
-
-## make sure bouncycastle is setup
-COPY --from=builder /build/bcprov-jdk15on-169.jar $JAVA_HOME/jre/lib/ext/bcprov-jdk15on-169.jar
-RUN cd $JAVA_HOME/jre/lib/security && \
-	echo 'security.provider.10=org.bouncycastle.jce.provider.BouncyCastleProvider' >> $JAVA_HOME/jre/lib/security/java.security
 
 COPY --from=builder /build/modules/core/target/scala-2.13/tesselation-core-assembly-0.0.1.jar /var/lib/constellation/cl-node.jar
 COPY --from=builder /build/modules/keytool/target/scala-2.13/tesselation-keytool-assembly-0.0.1.jar /var/lib/constellation/cl-keytool.jar
